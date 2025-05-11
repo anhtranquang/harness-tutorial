@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+  <!-- Background -->
+  <rect width="800" height="500" fill="#f5f5f5" />
+  
+  <!-- Title -->
+  <text x="400" y="40" font-family="Arial" font-size="24" text-anchor="middle" font-weight="bold">Kubernetes Architecture</text>
+  
+  <!-- Control Plane Box -->
+  <rect x="50" y="80" width="700" height="180" fill="#e1f5fe" stroke="#01579b" stroke-width="2" rx="10" />
+  <text x="400" y="105" font-family="Arial" font-size="20" text-anchor="middle" font-weight="bold" fill="#01579b">Control Plane</text>
+  
+  <!-- API Server -->
+  <rect x="100" y="130" width="120" height="60" fill="#bbdefb" stroke="#1976d2" stroke-width="2" rx="5" />
+  <text x="160" y="165" font-family="Arial" font-size="14" text-anchor="middle">API Server</text>
+  
+  <!-- etcd -->
+  <rect x="240" y="130" width="120" height="60" fill="#bbdefb" stroke="#1976d2" stroke-width="2" rx="5" />
+  <text x="300" y="165" font-family="Arial" font-size="14" text-anchor="middle">etcd</text>
+  
+  <!-- Scheduler -->
+  <rect x="380" y="130" width="120" height="60" fill="#bbdefb" stroke="#1976d2" stroke-width="2" rx="5" />
+  <text x="440" y="165" font-family="Arial" font-size="14" text-anchor="middle">Scheduler</text>
+  
+  <!-- Controller Manager -->
+  <rect x="520" y="130" width="180" height="60" fill="#bbdefb" stroke="#1976d2" stroke-width="2" rx="5" />
+  <text x="610" y="165" font-family="Arial" font-size="14" text-anchor="middle">Controller Manager</text>
+  
+  <!-- Cloud Controller Manager -->
+  <rect x="380" y="200" width="180" height="40" fill="#bbdefb" stroke="#1976d2" stroke-width="2" rx="5" />
+  <text x="470" y="225" font-family="Arial" font-size="12" text-anchor="middle">Cloud Controller Manager</text>
+  
+  <!-- Node Boxes -->
+  <rect x="50" y="290" width="340" height="180" fill="#e8f5e9" stroke="#388e3c" stroke-width="2" rx="10" />
+  <text x="170" y="315" font-family="Arial" font-size="20" text-anchor="middle" font-weight="bold" fill="#388e3c">Worker Node 1</text>
+  
+  <rect x="410" y="290" width="340" height="180" fill="#e8f5e9" stroke="#388e3c" stroke-width="2" rx="10" />
+  <text x="530" y="315" font-family="Arial" font-size="20" text-anchor="middle" font-weight="bold" fill="#388e3c">Worker Node 2</text>
+  
+  <!-- Kubelet Node 1 -->
+  <rect x="70" y="330" width="100" height="40" fill="#c8e6c9" stroke="#4caf50" stroke-width="2" rx="5" />
+  <text x="120" y="355" font-family="Arial" font-size="14" text-anchor="middle">kubelet</text>
+  
+  <!-- Kube Proxy Node 1 -->
+  <rect x="70" y="380" width="100" height="40" fill="#c8e6c9" stroke="#4caf50" stroke-width="2" rx="5" />
+  <text x="120" y="405" font-family="Arial" font-size="14" text-anchor="middle">kube-proxy</text>
+  
+  <!-- Container Runtime Node 1 -->
+  <rect x="70" y="430" width="140" height="30" fill="#c8e6c9" stroke="#4caf50" stroke-width="2" rx="5" />
+  <text x="140" y="450" font-family="Arial" font-size="12" text-anchor="middle">Container Runtime</text>
+  
+  <!-- Pods Node 1 -->
+  <rect x="250" y="330" width="120" height="40" fill="#dcedc8" stroke="#8bc34a" stroke-width="2" rx="10" />
+  <text x="310" y="355" font-family="Arial" font-size="14" text-anchor="middle">Pod</text>
+  
+  <rect x="250" y="380" width="120" height="40" fill="#dcedc8" stroke="#8bc34a" stroke-width="2" rx="10" />
+  <text x="310" y="405" font-family="Arial" font-size="14" text-anchor="middle">Pod</text>
+  
+  <!-- Kubelet Node 2 -->
+  <rect x="430" y="330" width="100" height="40" fill="#c8e6c9" stroke="#4caf50" stroke-width="2" rx="5" />
+  <text x="480" y="355" font-family="Arial" font-size="14" text-anchor="middle">kubelet</text>
+  
+  <!-- Kube Proxy Node 2 -->
+  <rect x="430" y="380" width="100" height="40" fill="#c8e6c9" stroke="#4caf50" stroke-width="2" rx="5" />
+  <text x="480" y="405" font-family="Arial" font-size="14" text-anchor="middle">kube-proxy</text>
+  
+  <!-- Container Runtime Node 2 -->
+  <rect x="430" y="430" width="140" height="30" fill="#c8e6c9" stroke="#4caf50" stroke-width="2" rx="5" />
+  <text x="500" y="450" font-family="Arial" font-size="12" text-anchor="middle">Container Runtime</text>
+  
+  <!-- Pods Node 2 -->
+  <rect x="610" y="330" width="120" height="40" fill="#dcedc8" stroke="#8bc34a" stroke-width="2" rx="10" />
+  <text x="670" y="355" font-family="Arial" font-size="14" text-anchor="middle">Pod</text>
+  
+  <rect x="610" y="380" width="120" height="40" fill="#dcedc8" stroke="#8bc34a" stroke-width="2" rx="10" />
+  <text x="670" y="405" font-family="Arial" font-size="14" text-anchor="middle">Pod</text>
+  
+  <!-- Connection lines -->
+  <!-- API Server to Node 1 -->
+  <line x1="160" y1="190" x2="120" y2="330" stroke="#1976d2" stroke-width="2" />
+  <!-- API Server to Node 2 -->
+  <line x1="160" y1="190" x2="480" y2="330" stroke="#1976d2" stroke-width="2" />
+  
+  <!-- Kubelet to Pods Node 1 -->
+  <line x1="170" y1="350" x2="250" y2="350" stroke="#4caf50" stroke-width="2" />
+  <line x1="170" y1="350" x2="250" y2="400" stroke="#4caf50" stroke-width="2" />
+  
+  <!-- Kubelet to Pods Node 2 -->
+  <line x1="530" y1="350" x2="610" y2="350" stroke="#4caf50" stroke-width="2" />
+  <line x1="530" y1="350" x2="610" y2="400" stroke="#4caf50" stroke-width="2" />
+  
+  <!-- Control Plane Component Connections -->
+  <line x1="220" y1="160" x2="240" y2="160" stroke="#1976d2" stroke-width="2" />
+  <line x1="360" y1="160" x2="380" y2="160" stroke="#1976d2" stroke-width="2" />
+  <line x1="500" y1="160" x2="520" y2="160" stroke="#1976d2" stroke-width="2" />
+  <line x1="440" y1="190" x2="440" y2="200" stroke="#1976d2" stroke-width="2" />
+</svg>
