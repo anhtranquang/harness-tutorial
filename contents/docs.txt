@@ -1,0 +1,385 @@
+h1. Kubernetes Architecture and EKS Comparison
+h2. A Comprehensive Overview
+
+{info:title=Note}
+Images in this document (e.g., Kubernetes Logo, Architecture Diagrams) should be uploaded to Confluence and referenced using their attachment names. Placeholder comments are included where images appear.
+{info}
+
+---
+
+h2. Introduction (5 minutes)
+
+h3. Evolution of Container Orchestration
+* *Pre-container era*: Traditional VMs and deployment challenges
+* *Container revolution*: Docker emerges (2013)
+* *Orchestration need*: Managing containers at scale becomes critical
+* *Google's influence*: From Borg internally to Kubernetes open-source (2014)
+* *CNCF adoption*: Kubernetes becomes the first CNCF project (2015)
+
+h3. What is Kubernetes?
+* An open-source platform for automating deployment, scaling, and operations of containerized applications
+* Originally designed by Google, now maintained by the Cloud Native Computing Foundation
+* Provides a "container-centric" infrastructure
+* Abstracts away the underlying hardware to create a consistent platform
+* Often abbreviated as K8s (8 represents the eight letters between 'K' and 's')
+
+h3. Why Kubernetes Matters
+* De facto standard for container orchestration
+* Enables consistent deployments across environments
+* Provides self-healing capabilities
+* Supports declarative configuration and automation
+* Offers built-in scalability
+* Has a large and active community
+* Ecosystem of tools and extensions
+
+h3. Managed Kubernetes Services
+* *Rising complexity*: Operating Kubernetes clusters requires specialized skills
+* *Cloud provider solutions*: Managed services emerge to reduce operational burden
+* *Examples*: Amazon EKS, Google GKE, Azure AKS, IBM Cloud Kubernetes Service
+* *Value proposition*: Focus on applications rather than infrastructure management
+
+---
+
+h2. Kubernetes Architecture Deep Dive (25 minutes)
+
+h3. High-Level Architecture Overview
+{noformat}
+// Placeholder: Upload image 'components-of-kubernetes.svg' to Confluence and insert here using !components-of-kubernetes.svg!
+{noformat}
+* *Two primary components*: Control Plane and Worker Nodes
+* *Design philosophy*: Distributed, loosely coupled, extensible
+* *Core principle*: Declarative rather than imperative
+* *State management*: Desired state vs current state reconciliation
+* *API-driven*: All actions go through the API server
+
+h3. Control Plane Components (10 minutes)
+{noformat}
+// Placeholder: Upload image 'components-of-kubernetes-control-plane.svg' to Confluence and insert here using !components-of-kubernetes-control-plane.svg!
+{noformat}
+
+h4. kube-apiserver
+* *Function*: Frontend for the Kubernetes control plane
+* *Responsibility*: Exposes the Kubernetes API
+* *Design*: Horizontally scalable by deploying multiple instances
+* *Security*: Handles authentication, authorization, admission control
+* *Communication*: All components and users interact through API server
+* *REST operations*: Validates and processes REST requests, updates etcd
+* *Watching*: Supports efficient watching of resources for changes
+
+h4. etcd
+* *Definition*: Distributed, consistent key-value store
+* *Purpose*: Primary datastore for all cluster data
+* *CAP theorem*: Prioritizes consistency and partition tolerance
+* *Operations*: Only the API server communicates directly with etcd
+* *Performance*: Optimized for read-heavy cluster operations
+* *High availability*: Typically deployed with 3-5 nodes for fault tolerance
+* *Criticality*: Requires careful backup and recovery planning
+* *Data storage*: Contains the entire state of the cluster
+
+h4. kube-scheduler
+* *Role*: Watches for newly created pods with no assigned node
+* *Function*: Selects optimal node for pod placement
+* *Considerations*: Resource requirements, constraints, affinity rules
+* *Process*:
+** Filter nodes (constraints, resource requirements)
+** Rank remaining nodes (scoring based on various priorities)
+** Bind pod to highest-ranked node
+* *Extensibility*: Supports custom scheduling policies
+* *Plugins*: Architecture allows for custom schedulers
+
+h4. kube-controller-manager
+* *Definition*: Component that runs controller processes
+* *Controllers*: Non-terminating control loops that regulate cluster state
+* *Examples of controllers*:
+** *Node controller*: Monitors node health, manages node lifecycle
+** *Replication controller*: Ensures desired number of pod replicas
+** *Endpoints controller*: Populates the Endpoints object
+** *Service Account & Token controllers*: Create accounts and API tokens
+* *Operation*: Each controller watches for changes and maintains desired state
+* *Logical separation*: While logically separate, compiled into a single binary
+
+h4. cloud-controller-manager
+* *Purpose*: Integrates with underlying cloud provider APIs
+* *Separation*: Allows Kubernetes core to evolve independently from cloud providers
+* *Cloud-specific controllers*:
+** *Node controller*: Check cloud provider for node deletion
+** *Route controller*: Configure routes in cloud infrastructure
+** *Service controller*: Create, update, delete cloud load balancers
+* *Provider implementations*: Each cloud provider develops their implementation
+* *Only runs in cloud environments*: Not present in on-premises deployments
+
+h3. Node Components (5 minutes)
+{noformat}
+// Placeholder: Upload image 'components-of-kubernetes-node.svg' to Confluence and insert here using !components-of-kubernetes-node.svg!
+{noformat}
+
+h4. kubelet
+* *Definition*: Agent running on each node
+* *Primary responsibility*: Ensuring containers run in a pod
+* *Operation*: Takes PodSpecs and ensures described containers are running
+* *Reporting*: Provides node and pod status to the control plane
+* *Container health*: Manages container liveness, readiness probes
+* *Garbage collection*: Cleans up unused images and containers
+* *Dynamic configuration*: Supports dynamic kubelet configuration
+
+h4. kube-proxy
+* *Role*: Network proxy running on each node
+* *Function*: Implements the Kubernetes Service concept
+* *Modes*:
+** *iptables*: Default, rule-based routing
+** *IPVS*: For high-performance requirements
+** *userspace*: Legacy mode, rarely used now
+* *Operation*: Maintains network rules that allow communication to pods
+* *Load balancing*: Distributes traffic among pod backends
+
+h4. Container Runtime
+* *Definition*: Software responsible for running containers
+* *Requirement*: Must implement Container Runtime Interface (CRI)
+* *Common options*:
+** *containerd*: Lightweight, focused container runtime (now default)
+** *CRI-O*: Lightweight runtime optimized for Kubernetes
+** *Docker Engine*: Used historically (now via containerd adapter)
+* *Responsibilities*: Image management, container execution, supervision
+
+h3. Kubernetes Networking (10 minutes)
+
+h4. Core Networking Requirements
+* *Every pod has unique IP*: Pods can be treated like VMs or physical hosts
+* *Pod-to-pod communication*: All pods can communicate with all other pods
+* *Node-to-pod communication*: Nodes can communicate with all pods
+* *Pod-to-service communication*: Via stable virtual IPs and DNS
+
+h4. Network Model Implementation
+{noformat}
+// Placeholder: Upload image 'services-iptables-overview.svg' to Confluence and insert here using !services-iptables-overview.svg!
+{noformat}
+* *CNI (Container Network Interface)*: Plugin-based networking architecture
+* *Popular CNI plugins*:
+** *Calico*: Policy-rich networking with BGP
+** *Flannel*: Simple overlay network
+** *Cilium*: eBPF-based networking and security
+** *AWS VPC CNI*: Direct integration with AWS VPC networking
+* *Implementation details*: Varies by plugin but adheres to Kubernetes requirements
+
+h4. Service Networking
+* *ClusterIP*: Default type, internal-only virtual IP
+* *NodePort*: Exposes service on static port on each node
+* *LoadBalancer*: Integrates with cloud load balancers
+* *ExternalName*: Maps service to DNS name
+* *kube-proxy role*: Implements service abstraction
+
+h4. Ingress Controllers
+* *Purpose*: HTTP/HTTPS routing to internal services
+* *Features*: Path-based routing, TLS termination, name-based virtual hosting
+* *Popular implementations*: NGINX, HAProxy, Traefik, AWS ALB Ingress Controller
+* *Architecture*: Sits at edge of cluster, routes external traffic
+
+---
+
+h2. Amazon EKS vs Self-Managed Kubernetes (20 minutes)
+
+h3. EKS Architecture (10 minutes)
+{noformat}
+// Placeholder: Upload image 'Amazon-EKS.png' to Confluence and insert here using !Amazon-EKS.png!
+{noformat}
+
+h4. EKS Control Plane
+* *Regional service*: Runs across multiple AZs for high availability
+* *Managed components*: API server, etcd, scheduler, controllers
+* *Infrastructure*: AWS manages hardware, OS patching, Kubernetes updates
+* *Endpoint access*: Public and private endpoint options
+* *Kubernetes version*: Typically supports multiple versions
+* *Control plane scaling*: Automatic scaling based on load
+* *Cost model*: Fixed cost per cluster regardless of nodes
+
+h4. AWS-Specific Integrations
+|| AWS Service || Integration Type || Benefits ||
+| IAM | Identity Management | Fine-grained access control via IAM roles for service accounts |
+| VPC | Networking | Native VPC integration for pod and cluster networking |
+| ELB/ALB/NLB | Load Balancing | Automatic provisioning through service/ingress resources |
+| ECR | Image Registry | Seamless private container image storage |
+| CloudWatch | Monitoring | Native metrics and logging integration |
+| CloudTrail | Auditing | API call logging and audit trail |
+| KMS | Encryption | Secrets encryption with AWS KMS |
+
+h4. EKS Networking
+{noformat}
+// Placeholder: Upload image 'networking-overview.svg' to Confluence and insert here using !networking-overview.svg!
+{noformat}
+* *Amazon VPC CNI plugin*: Pods get IPs directly from VPC
+* *IP allocation efficiency*: Each node reserves IPs from VPC subnet
+* *Security groups for pods*: Apply AWS security groups directly to pods
+* *VPC sharing*: Cross-account VPC sharing support
+* *Custom networking*: Support for custom CNI configurations
+* *IPv6 support*: Dual-stack networking capabilities
+* *Transit Gateway*: Cross-VPC and on-premises connectivity
+
+h4. Storage Options with EKS
+* *EBS CSI Driver*: Dynamic provisioning of EBS volumes
+* *EFS CSI Driver*: Shared file storage across pods and nodes
+* *FSx for Lustre*: High-performance file system integration
+* *S3 integration*: Object storage access patterns
+* *Persistent volumes*: Standard Kubernetes storage abstractions
+
+h4. EKS-Specific Security Features
+* *Security groups for pods*: Network security at pod level
+* *IAM roles for service accounts (IRSA)*: Fine-grained access control
+* *Private clusters*: Control plane with no public endpoint
+* *EKS-optimized AMIs*: Hardened, regularly patched node images
+* *Pod security policies*: Deprecated but supported with alternatives
+* *Kubernetes secrets encryption*: Integration with AWS KMS
+* *Network policies*: Support via various CNI plugins
+* *AWS Shield & WAF integration*: For edge protection
+
+h4. Cluster Management and Operations
+* *EKS Console*: Web-based management interface
+* *eksctl*: Command-line utility for cluster operations
+* *AWS CDK/CloudFormation*: Infrastructure as code support
+* *Managed node groups*: Automated node lifecycle management
+* *Fargate profiles*: Serverless container execution option
+* *Add-ons management*: AWS-managed Kubernetes add-ons
+
+h3. Key Differences: EKS vs Self-Managed (10 minutes)
+{noformat}
+// Placeholder: Upload image 'EKS-vs-Self-Managed.png' to Confluence and insert here using !EKS-vs-Self-Managed.png!
+{noformat}
+
+h4. 1. Management Overhead
+|| Aspect || Self-Managed Kubernetes || Amazon EKS ||
+| Control plane setup | Manual deployment and configuration | Fully managed, single-click creation |
+| Control plane monitoring | Self-implemented monitoring required | AWS-managed monitoring |
+| Version upgrades | Manual upgrade process, potential downtime | Simplified, in-place upgrades |
+| High availability | Manual configuration of multi-master | Built-in HA across availability zones |
+| Time investment | Significant ongoing operational time | Reduced operational overhead |
+| Expertise requirement | Deep Kubernetes expertise needed | Less specialized knowledge required |
+
+h4. 2. Installation and Setup
+|| Aspect || Self-Managed Kubernetes || Amazon EKS ||
+| Deployment tools | kubeadm, kops, kubespray, etc. | EKS console, eksctl, CloudFormation, Terraform |
+| Time to production | Hours to days depending on expertise | Minutes to hours |
+| Configuration options | Complete flexibility | Limited to EKS-supported configurations |
+| Infrastructure provisioning | Manual or custom automation | Integrated with AWS provisioning |
+| Initial complexity | High initial setup complexity | Reduced initial complexity |
+| Customization | Unlimited customization potential | Constrained by EKS design choices |
+
+h4. 3. Upgrades and Maintenance
+|| Aspect || Self-Managed Kubernetes || Amazon EKS ||
+| Control plane upgrades | Manual process, potential service disruption | One-click upgrades, minimal disruption |
+| Upgrade testing | Required prior to production upgrades | Pre-tested by AWS |
+| Node upgrades | Manual or custom automation | Managed node groups with rolling updates |
+| Patching responsibility | Full responsibility for all components | Shared responsibility model |
+| Maintenance windows | Self-scheduled | Coordinated but customizable |
+| Version support | Self-determined | EKS version support timeline |
+
+h4. 4. High Availability Configuration
+|| Aspect || Self-Managed Kubernetes || Amazon EKS ||
+| Control plane HA | Manual setup across failure domains | Built-in across availability zones |
+| etcd resilience | Manual configuration and monitoring | AWS-managed resilience |
+| Recovery time objective | Self-engineered, potentially longer | AWS SLA-backed |
+| Region failover | Complex, manual implementation | Still complex but simplified with EKS |
+| Disaster recovery | Custom backup and restore procedures | EKS-optimized backup solutions |
+| Geographic distribution | Full control but complex setup | Limited by EKS regional availability |
+
+h4. 5. Scaling Capabilities
+|| Aspect || Self-Managed Kubernetes || Amazon EKS ||
+| Cluster autoscaling | Manual integration | Native integration with ASG |
+| Node provisioning speed | Depends on infrastructure | Optimized for AWS infrastructure |
+| Maximum cluster size | Self-limited | AWS service quotas apply |
+| Control plane scaling | Manual scaling required | Automatic, transparent scaling |
+| Multi-cluster management | Additional tools required | EKS Connector, AWS management tools |
+| Serverless options | Limited without custom work | Native Fargate integration |
+
+h4. 6. Cost Considerations
+|| Aspect || Self-Managed Kubernetes || Amazon EKS ||
+| Control plane cost | Infrastructure cost only | $73 per cluster per month |
+| Worker node cost | Infrastructure cost only | Standard EC2 pricing + optional managed node fees |
+| Hidden costs | Operational time, expertise | AWS data transfer, EBS volumes |
+| Cost optimization | Complete control | Limited by AWS pricing models |
+| Spot instance use | Manual integration | Native integration |
+| Reserved instance benefit | Direct application | Direct application |
+
+h4. 7. Integration with AWS Services
+|| Aspect || Self-Managed Kubernetes || Amazon EKS ||
+| IAM integration | Manual configuration | Native integration, IRSA |
+| Load balancer provisioning | Manual setup or custom controllers | Automatic provisioning |
+| Service discovery | CoreDNS only | Route 53, CloudMap integration |
+| Secret management | Standard Kubernetes only | KMS encryption, Secrets Manager integration |
+| Logging and monitoring | Self-implemented | CloudWatch, Container Insights integration |
+| Application services | Manual integration | Streamlined service integration |
+
+h4. 8. Security Features and Compliance
+|| Aspect || Self-Managed Kubernetes || Amazon EKS ||
+| Compliance certifications | Self-certification required | Inherits AWS compliance (HIPAA, PCI, SOC, etc.) |
+| Security patching | Manual responsibility | AWS-managed for control plane |
+| Network security | Manual implementation | VPC integration, security groups for pods |
+| Authentication options | Custom configuration | AWS IAM integration |
+| Audit logging | Manual setup | CloudTrail integration |
+| Security assessments | Self-managed | AWS-supported assessments |
+
+---
+
+h2. Best Practices & Recommendations (8 minutes)
+{noformat}
+// Placeholder: Upload image 'eks-architecture-1.jpg' to Confluence and insert here using !eks-architecture-1.jpg!
+{noformat}
+
+h3. When to Choose Self-Managed Kubernetes
+* Need for specialized configurations not supported by EKS
+* Multi-cloud strategy with identical setup across providers
+* Regulatory requirements that prohibit managed services
+* Specialized hardware requirements
+* Complete control over infrastructure and upgrade timing
+* Academic or learning environments
+
+h3. When to Choose Amazon EKS
+* Focus on application development rather than infrastructure
+* AWS-centric cloud strategy
+* Need for reduced operational overhead
+* Integration with AWS ecosystem is prioritized
+* Compliance requirements aligned with AWS certifications
+* Predictable pricing model is valuable
+
+h3. Architecture Recommendations for EKS
+* Implement node group strategies (separate workload types)
+* Leverage spot instances for non-critical workloads
+* Utilize managed node groups for simplified operations
+* Plan networking CIDR blocks carefully for future growth
+* Implement proper tagging for cost allocation
+* Consider Fargate for variable workloads
+* Implement proper IAM roles for service accounts (IRSA)
+
+h3. Production Deployment Considerations
+* Implement proper monitoring and alerting
+* Develop clear upgrade strategies and testing procedures
+* Document disaster recovery procedures
+* Automate cluster creation with Infrastructure as Code
+* Implement GitOps workflows for application deployment
+* Consider multi-cluster strategies for high availability
+* Optimize cost through right-sizing and auto-scaling
+
+---
+
+h2. Q&A Session (2 minutes)
+
+h3. Common Questions
+* How does EKS pricing compare to self-managed over time?
+* What are the limitations of EKS Fargate compared to node-based deployments?
+* How does EKS handle major version upgrades?
+* What is the learning curve difference between EKS and self-managed?
+* How does EKS integrate with existing AWS infrastructure?
+
+h3. Additional Resources
+* EKS Best Practices Guide: [https://aws.github.io/aws-eks-best-practices/|https://aws.github.io/aws-eks-best-practices/]
+* Kubernetes Documentation: [https://kubernetes.io/docs/|https://kubernetes.io/docs/]
+* eksctl Getting Started: [https://eksctl.io/|https://eksctl.io/]
+* AWS EKS Workshop: [https://www.eksworkshop.com/|https://www.eksworkshop.com/]
+* CNCF Kubernetes Training: [https://www.cncf.io/certification/training/|https://www.cncf.io/certification/training/]
+
+---
+
+h2. Thank You!
+
+h3. Contact Information
+* Your Name
+* Your Email
+* Your Organization
