@@ -1,0 +1,84 @@
+1. Introduction (0:00–0:05)
+Image Idea: Kubernetes Logo or Cluster Overview Diagram
+Purpose: Set the context by showing the Kubernetes logo or a high-level cluster architecture diagram to introduce Kubernetes as a container orchestration platform.
+Description: A simple diagram showing a Kubernetes cluster with control plane and worker nodes, or the official Kubernetes logo.
+Source:
+Kubernetes Logo: Download the official logo from the Kubernetes website under the "Branding" section. Ensure you follow their usage guidelines.
+Cluster Architecture Diagram: Use a reference architecture diagram from Kubernetes.io. For example, the diagram mentioned in the cluster architecture page shows a reference architecture with control plane and nodes.
+Alternative: Use a tool like Creately to create a basic cluster diagram showing nodes, pods, and the control plane.
+Markdown Inclusion:
+markdown
+
+![Kubernetes Cluster Overview](images/kubernetes-cluster-diagram.png)
+Save the image as kubernetes-cluster-diagram.png in an images/ folder relative to your Markdown file.
+2. Kubernetes Resources (0:05–0:25)
+Image Idea: Kubernetes Resources Relationship Diagram
+Purpose: Visualize how resources like Pods, Deployments, Services, DaemonSets, StatefulSets, ConfigMaps, Secrets, Volumes, and Ingress interact within a cluster.
+Description: A diagram showing relationships, e.g., Pods managed by Deployments, Services exposing Pods, Ingress routing to Services, and StatefulSets with Volumes. This could be a force-directed graph or a flowchart.
+Source:
+Existing Diagrams: Check learnk8s.io for a downloadable Kubernetes deployment debugging diagram that includes Pods, Deployments, and Services (available in PDF/PNG).
+GitHub Repositories: The cloudogu/k8s-diagrams repository on GitHub offers PlantUML-based diagrams for Kubernetes resources. You can clone the repo, generate a diagram (e.g., for Pods or Deployments), and export it as PNG.
+Custom Creation: Use Mermaid.js to create a diagram. For example, the sommerit/k8s-to-mermaid script mentioned in X posts can parse YAML files to generate Mermaid class diagrams visualizing resource relationships.
+Example Mermaid code for a simple resource relationship:
+mermaid
+
+graph TD
+    A[Deployment] --> B[Pod]
+    B --> C[Service]
+    C --> D[Ingress]
+    E[ConfigMap] --> B
+    F[Secret] --> B
+    G[PersistentVolume] --> H[PersistentVolumeClaim]
+    H --> B
+Render this using the Mermaid Live Editor and export as PNG.
+Specific Resource Diagrams:
+Deployment + Service: A diagram showing a Deployment managing multiple Pods and a Service exposing them. You can adapt the example from phoenixnap.com for a visual of Pods and Services.
+DaemonSet: Illustrate a DaemonSet deploying one Pod per node (e.g., NGINX Ingress Controller). Use a diagram showing nodes with a Pod on each, inspired by Kubernetes.io.
+StatefulSet + ConfigMap + Secret + Volume + PV/PVC + Ingress: Create a complex diagram for the Confluence example, showing a StatefulSet pod linked to a ConfigMap, Secret, PersistentVolumeClaim, and Ingress. Use Creately or Miro to draw this, as they support detailed Kubernetes architecture diagrams.
+Markdown Inclusion:
+markdown
+
+![Kubernetes Resources Relationships](images/k8s-resources-relationships.png)
+![Deployment and Service](images/deployment-service.png)
+![DaemonSet Example](images/daemonset.png)
+![Confluence StatefulSet Architecture](images/confluence-statefulset.png)
+3. Helm Charts (0:25–0:45)
+Image Idea: Helm Chart Structure and Deployment Flow
+Purpose: Show the anatomy of a Helm chart and how it deploys resources to a Kubernetes cluster.
+Description:
+Chart Structure: A diagram of the Helm chart folder structure (Chart.yaml, values.yaml, templates/), highlighting how values.yaml customizes templates.
+Deployment Flow: A flowchart showing the process of helm install creating a Release, rendering templates, and deploying resources (e.g., Deployment, Service).
+Source:
+Chart Structure: Create a simple diagram using Draw.io or Miro to visualize the folder structure. Alternatively, check Helm Docs for an official illustration of chart anatomy.
+Deployment Flow: Use withcoherence.com for inspiration, as they explain Kubernetes components with flowcharts. Adapt their style to show helm install → Template Rendering → Kubernetes API → Resource Creation.
+Existing Visuals: The livewyer.io Kubernetes Glossary includes an illustration of a Helm chart, which you can use as a reference to create a similar image.
+Custom Creation:
+Use Mermaid.js for a deployment flow:
+mermaid
+
+graph LR
+    A[Helm Chart] --> B[helm install]
+    B --> C[Values.yaml]
+    C --> D[Templates]
+    D --> E[Kubernetes API]
+    E --> F[Deployment]
+    E --> G[Service]
+Render and export from the Mermaid Live Editor.
+Markdown Inclusion:
+markdown
+
+![Helm Chart Structure](images/helm-chart-structure.png)
+![Helm Deployment Flow](images/helm-deployment-flow.png)
+4. Live Demo (0:45–0:55)
+Image Idea: Screenshot or Diagram of Deployed NGINX Resources
+Purpose: Show the output of the Helm demo, such as the NGINX pods and services created.
+Description: A screenshot of kubectl get pods,svc output or a diagram of the NGINX Deployment and Service created by the Bitnami NGINX chart.
+Source:
+Screenshot: Run the demo commands (helm install my-nginx bitnami/nginx and kubectl get pods,svc) in your terminal, capture the output using a screenshot tool, and crop it to show the relevant resources.
+Diagram: Create a diagram showing the NGINX Deployment (3 replicas) and Service (port 8080) using Draw.io or Eraser.io, which offers an AI Kubernetes diagram generator.
+Inspiration: Adapt the deployment diagram from learnk8s.io to show the NGINX-specific setup.
+Markdown Inclusion:
+markdown
+
+![NGINX Helm Deployment](images/nginx-helm-deployment.png)
+5. Q&A and Wrap-Up (0:55–1:00)
